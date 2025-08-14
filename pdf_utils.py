@@ -122,9 +122,9 @@ def create_pdf_report(df, selected_user, num_messages, words, num_media_messages
     
     if insights:
         for insight in insights:
-            pdf.cell(0, 10, f'• {insight}', 0, 1)
+            pdf.cell(0, 10, f'- {insight}', 0, 1)
     else:
-        pdf.cell(0, 10, '• Standard conversation patterns observed', 0, 1)
+        pdf.cell(0, 10, '- Standard conversation patterns observed', 0, 1)
     
     # Add footer
     pdf.add_page()

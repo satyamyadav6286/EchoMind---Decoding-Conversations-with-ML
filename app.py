@@ -454,7 +454,7 @@ elif st.session_state.current_page == "upload":
             
             # Create QR code
             qr = qrcode.QRCode(version=1, box_size=10, border=5)
-            qr.add_data("https://echomind.streamlit.app")
+            qr.add_data("https://echomind-app.streamlit.app/")
             qr.make(fit=True)
             
             # Create QR code image
@@ -538,7 +538,7 @@ elif st.session_state.current_page == "about":
     
     # Create QR code
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data("https://echomind.streamlit.app")
+    qr.add_data("https://echomind-app.streamlit.app/")
     qr.make(fit=True)
     
     # Create QR code image

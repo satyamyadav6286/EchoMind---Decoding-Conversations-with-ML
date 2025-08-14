@@ -5,8 +5,6 @@ from datetime import datetime
 
 class PDF(FPDF):
     def header(self):
-        # Logo
-        self.image('logo.png', 10, 8, 25)
         # Arial bold 15
         self.set_font('Arial', 'B', 15)
         # Move to the right

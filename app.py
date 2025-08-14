@@ -32,10 +32,6 @@ def local_css(file_name):
 # Load custom CSS
 local_css("style.css")
 
-# Initialize session state
-if 'page' not in st.session_state:
-    st.session_state.page = "🏠 Home"
-
 # Simple footer function without HTML
 def simple_footer():
     st.markdown("---")
@@ -75,18 +71,13 @@ with st.sidebar:
             "nav-link-selected": {"background-color": "#4f46e5"},
         }
     )
-    
-    # Update session state when navigation changes
-    if selected != st.session_state.page:
-        st.session_state.page = selected
-        st.rerun()
 
 
 
 
 
 # Home Page
-if st.session_state.page == "🏠 Home":
+if selected == "🏠 Home":
     # Use container to ensure full visibility
     with st.container():
         st.markdown("## Welcome to EchoMind")
@@ -129,16 +120,14 @@ if st.session_state.page == "🏠 Home":
     st.markdown("### Ready to get started?")
     st.markdown("Upload your chat data and unlock powerful insights today!")
     
-    if st.button("📤 Upload Chat Data", type="primary"):
-        # Use session state to switch to upload page
-        st.session_state.page = "📊 Upload & Analyze"
-        st.rerun()
+    st.markdown("### 📤 Ready to get started?")
+    st.markdown("Click on **'📊 Upload & Analyze'** in the sidebar to begin!")
     
     # Add simple footer
     simple_footer()
 
 # Upload & Analyze Page
-elif st.session_state.page == "📊 Upload & Analyze":
+elif selected == "📊 Upload & Analyze":
     # Use container to ensure full visibility
     with st.container():
         st.markdown("""
@@ -496,7 +485,7 @@ elif st.session_state.page == "📊 Upload & Analyze":
             simple_footer()
 
 # About Page
-elif st.session_state.page == "ℹ️ About":
+elif selected == "ℹ️ About":
     # Use container to ensure full visibility
     with st.container():
         st.markdown("## About EchoMind")

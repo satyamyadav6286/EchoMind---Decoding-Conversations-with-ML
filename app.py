@@ -11,6 +11,7 @@ import os
 from datetime import datetime
 import uuid
 import pandas as pd
+import io
 from io import BytesIO
 from fpdf import FPDF
 from pdf_utils import create_pdf_report, get_binary_file_downloader_html

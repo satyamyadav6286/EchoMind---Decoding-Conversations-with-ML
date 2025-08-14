@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
-from streamlit_option_menu import option_menu
 import json
 import base64
 import tempfile
@@ -49,32 +48,32 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar with navigation - ALWAYS VISIBLE
+# Sidebar - SIMPLE APPROACH
 with st.sidebar:
-    # EchoMind Logo and Title
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <h3 style="color: #4f46e5; margin-bottom: 0.5rem;">🧠 EchoMind</h3>
-        <p style="color: #b8b8b8; font-size: 0.9rem;">Conversation Analysis Platform</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.title("🧠 EchoMind")
+    st.caption("Conversation Analysis Platform")
     
-    # Navigation Menu
-    selected = option_menu(
-        menu_title=None,
-        options=["🏠 Home", "📊 Upload & Analyze", "ℹ️ About"],
-        icons=["house", "cloud-upload", "info-circle"],
-        default_index=0,
-        styles={
-            "container": {"padding": "0!important", "background-color": "#1a1a2e"},
-            "icon": {"color": "#4f46e5", "font-size": "18px"}, 
-            "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "--hover-color": "#16213e", "color": "#ffffff"},
-            "nav-link-selected": {"background-color": "#4f46e5"},
-        }
-    )
+    # Simple navigation buttons
+    st.markdown("### Navigation")
+    
+    if st.button("🏠 Home", key="nav_home"):
+        st.session_state.current_page = "home"
+        st.rerun()
+    
+    if st.button("📊 Upload & Analyze", key="nav_upload"):
+        st.session_state.current_page = "upload"
+        st.rerun()
+    
+    if st.button("ℹ️ About", key="nav_about"):
+        st.session_state.current_page = "about"
+        st.rerun()
+
+# Initialize current page
+if 'current_page' not in st.session_state:
+    st.session_state.current_page = "home"
 
 # Main Content Area
-if selected == "🏠 Home":
+if st.session_state.current_page == "home":
     st.markdown("## Welcome to EchoMind")
     st.markdown("Your advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.")
     
@@ -121,7 +120,7 @@ if selected == "🏠 Home":
     # Add simple footer
     simple_footer()
 
-elif selected == "📊 Upload & Analyze":
+elif st.session_state.current_page == "upload":
     st.markdown("## 📊 Upload & Analyze Your Chat")
     st.markdown("Upload your exported chat file to begin comprehensive analysis.")
     
@@ -472,7 +471,7 @@ elif selected == "📊 Upload & Analyze":
             # Add simple footer
             simple_footer()
 
-elif selected == "ℹ️ About":
+elif st.session_state.current_page == "about":
     st.markdown("## About EchoMind")
     st.markdown("EchoMind is an advanced conversation analysis platform that helps you gain deep insights from your chat data using Machine Learning and Data Visualization techniques. Our platform provides comprehensive analytics to understand conversation patterns, sentiment, and engagement metrics.")
     

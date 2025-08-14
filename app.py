@@ -149,45 +149,48 @@ def footer():
 
 # Home Page
 if selected == "🏠 Home":
-    st.markdown("""
-    <div class="welcome-section">
-        <h2>Welcome to EchoMind</h2>
-        <p>Your advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.</p>
+    st.markdown("## Welcome to EchoMind")
+    st.markdown("Your advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.")
+    
+    st.markdown("### 🚀 Key Features")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        **📊 Conversation Analytics**
         
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>📊 Conversation Analytics</h3>
-                <p>Get detailed statistics and visualizations of your chat data including message counts, word frequency, and activity patterns.</p>
-            </div>
-            <div class="feature-card">
-                <h3>🔍 Sentiment Analysis</h3>
-                <p>Understand the emotional tone of your conversations with advanced sentiment analysis algorithms.</p>
-            </div>
-            <div class="feature-card">
-                <h3>📈 Trend Analysis</h3>
-                <p>Track conversation patterns and trends over time with interactive timeline visualizations.</p>
-            </div>
-            <div class="feature-card">
-                <h3>📝 Word Cloud</h3>
-                <p>Visual representation of the most frequently used words in your conversations.</p>
-            </div>
-            <div class="feature-card">
-                <h3>😊 Emoji Analysis</h3>
-                <p>Discover the most used emojis and understand emotional expressions in your chats.</p>
-            </div>
-            <div class="feature-card">
-                <h3>📱 Activity Heatmap</h3>
-                <p>Visualize when conversations are most active with detailed hourly and daily heatmaps.</p>
-            </div>
-        </div>
+        Get detailed statistics and visualizations of your chat data including message counts, word frequency, and activity patterns.
         
-        <div class="cta-section">
-            <h3>Ready to get started?</h3>
-            <p>Upload your chat data and unlock powerful insights today!</p>
-            <a href="#upload" class="btn btn-primary">📤 Upload Chat Data</a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        **🔍 Sentiment Analysis**
+        
+        Understand the emotional tone of your conversations with advanced sentiment analysis algorithms.
+        
+        **📈 Trend Analysis**
+        
+        Track conversation patterns and trends over time with interactive timeline visualizations.
+        """)
+    
+    with col2:
+        st.markdown("""
+        **📝 Word Cloud**
+        
+        Visual representation of the most frequently used words in your conversations.
+        
+        **😊 Emoji Analysis**
+        
+        Discover the most used emojis and understand emotional expressions in your chats.
+        
+        **📱 Activity Heatmap**
+        
+        Visualize when conversations are most active with detailed hourly and daily heatmaps.
+        """)
+    
+    st.markdown("---")
+    st.markdown("### Ready to get started?")
+    st.markdown("Upload your chat data and unlock powerful insights today!")
+    
+    if st.button("📤 Upload Chat Data", type="primary"):
+        st.switch_page("📊 Upload & Analyze")
 
 # Upload & Analyze Page
 elif selected == "📊 Upload & Analyze":
@@ -328,18 +331,24 @@ elif selected == "📊 Upload & Analyze":
             # Weekly Activity Heatmap
             st.markdown("#### 🔥 Weekly Activity Heatmap")
             user_heatmap = helper.activity_heatmap(selected_user, df)
-            fig = px.imshow(user_heatmap,
-                          labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
-                          x=[f"{h:02d}:00" for h in range(24)],
-                          y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                          color_continuous_scale='Viridis',
-                          template='plotly_dark')
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                            paper_bgcolor='rgba(0,0,0,0)',
-                            xaxis=dict(showgrid=False, color='#b8b8b8'),
-                            yaxis=dict(showgrid=False, color='#b8b8b8'),
-                            font=dict(color='#ffffff'))
-            st.plotly_chart(fig, use_container_width=True)
+            if user_heatmap is not None and not user_heatmap.empty:
+                try:
+                    fig = px.imshow(user_heatmap.values,
+                                  labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
+                                  x=[f"{h:02d}:00" for h in range(24)],
+                                  y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                                  color_continuous_scale='Viridis',
+                                  template='plotly_dark')
+                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                    yaxis=dict(showgrid=False, color='#b8b8b8'),
+                                    font=dict(color='#ffffff'))
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.warning("Unable to display heatmap. Data may be insufficient.")
+            else:
+                st.info("Not enough data to generate activity heatmap.")
             
             # Finding the busiest users in the group (Group level only)
             if selected_user == 'Overall':
@@ -401,6 +410,45 @@ elif selected == "📊 Upload & Analyze":
             else:
                 st.info("Not enough data to display common words.")
             
+            # Enhanced Chat Statistics
+            st.markdown("### 📊 Detailed Chat Statistics")
+            
+            # Calculate additional statistics
+            total_days = (df['date'].max() - df['date'].min()).days + 1 if len(df) > 0 else 0
+            avg_messages_per_day = num_messages / total_days if total_days > 0 else 0
+            avg_words_per_message = words / num_messages if num_messages > 0 else 0
+            
+            # Display detailed stats in columns
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.markdown(f"""
+                <div class='stat-card'>
+                    <h3>Avg Messages/Day</h3>
+                    <h2>{avg_messages_per_day:.1f}</h2>
+                </div>
+                """, unsafe_allow_html=True)
+            with col2:
+                st.markdown(f"""
+                <div class='stat-card'>
+                    <h3>Avg Words/Message</h3>
+                    <h2>{avg_words_per_message:.1f}</h2>
+                </div>
+                """, unsafe_allow_html=True)
+            with col3:
+                st.markdown(f"""
+                <div class='stat-card'>
+                    <h3>Total Days</h3>
+                    <h2>{total_days}</h2>
+                </div>
+                """, unsafe_allow_html=True)
+            with col4:
+                st.markdown(f"""
+                <div class='stat-card'>
+                    <h3>Media Ratio</h3>
+                    <h2>{(num_media_messages/num_messages*100):.1f}%</h2>
+                </div>
+                """, unsafe_allow_html=True)
+            
             # Emoji Analysis
             st.markdown("### 😊 Emoji Analysis")
             emoji_df = helper.emoji_helper(selected_user, df)
@@ -429,6 +477,24 @@ elif selected == "📊 Upload & Analyze":
                         st.plotly_chart(fig, use_container_width=True)
                     else:
                         st.info("Not enough emoji data for visualization")
+                        
+                # Most Used Emojis Bar Chart
+                st.markdown("#### 📈 Most Used Emojis Trend")
+                if len(emoji_df) >= 10:
+                    fig = px.bar(emoji_df.head(10), 
+                               x=emoji_df[0].head(10), 
+                               y=emoji_df[1].head(10),
+                               labels={'x': 'Emoji', 'y': 'Frequency'},
+                               color=emoji_df[1].head(10),
+                               color_continuous_scale='Viridis',
+                               template='plotly_dark')
+                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                    yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
+                                    font=dict(color='#ffffff'),
+                                    showlegend=False)
+                    st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No emoji data available for analysis.")
             
@@ -448,73 +514,60 @@ elif selected == "📊 Upload & Analyze":
 
 # About Page
 elif selected == "ℹ️ About":
+    st.markdown("## About EchoMind")
+    st.markdown("EchoMind is an advanced conversation analysis platform that helps you gain deep insights from your chat data using Machine Learning and Data Visualization techniques. Our platform provides comprehensive analytics to understand conversation patterns, sentiment, and engagement metrics.")
+    
+    st.markdown("### 🚀 Key Features")
     st.markdown("""
-    <div class="about-section">
-        <h2>About EchoMind</h2>
-        <p>EchoMind is an advanced conversation analysis platform that helps you gain deep insights from your chat data using Machine Learning and Data Visualization techniques. Our platform provides comprehensive analytics to understand conversation patterns, sentiment, and engagement metrics.</p>
+    - 📊 Detailed conversation statistics and analytics
+    - 📅 Timeline analysis of message frequency
+    - 📈 Activity patterns and trends visualization
+    - 📝 Interactive word cloud generation
+    - 😊 Comprehensive emoji analysis
+    - 👥 User activity comparison (for group chats)
+    - 🔥 Activity heatmaps for time-based insights
+    - 📄 PDF report generation and download
+    """)
+    
+    st.markdown("### 📋 How to Use")
+    st.markdown("""
+    1. Export your WhatsApp chat (without media)
+    2. Navigate to the 'Upload & Analyze' page
+    3. Upload your chat file (.txt format)
+    4. Select user for analysis (or choose 'Overall' for group analysis)
+    5. Explore the comprehensive insights and visualizations
+    6. Download your analysis report in PDF format
+    """)
+    
+    st.markdown("### 👥 Project Team")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("#### Satyam Govind Yadav")
+        st.markdown("**Lead Developer & ML Engineer**")
+        st.markdown("""
+        [![GitHub](https://img.icons8.com/ios-filled/20/000000/github.png)](https://github.com/satyamyadav6286) [GitHub](https://github.com/satyamyadav6286)
         
-        <h3>🚀 Key Features</h3>
-        <ul class="feature-list">
-            <li>📊 Detailed conversation statistics and analytics</li>
-            <li>📅 Timeline analysis of message frequency</li>
-            <li>📈 Activity patterns and trends visualization</li>
-            <li>📝 Interactive word cloud generation</li>
-            <li>😊 Comprehensive emoji analysis</li>
-            <li>👥 User activity comparison (for group chats)</li>
-            <li>🔥 Activity heatmaps for time-based insights</li>
-            <li>📄 PDF report generation and download</li>
-        </ul>
+        [![LinkedIn](https://img.icons8.com/ios-filled/20/000000/linkedin.png)](https://www.linkedin.com/in/satyamgovindyadav/) [LinkedIn](https://www.linkedin.com/in/satyamgovindyadav/)
+        """)
+    
+    with col2:
+        st.markdown("#### Arunkumar Gupta")
+        st.markdown("**UI/UX Designer & Developer**")
+        st.markdown("""
+        [![GitHub](https://img.icons8.com/ios-filled/20/000000/github.png)](https://github.com/arun-060) [GitHub](https://github.com/arun-060)
         
-        <h3>📋 How to Use</h3>
-        <ol style="color: var(--text-secondary); line-height: 1.6;">
-            <li>Export your WhatsApp chat (without media)</li>
-            <li>Navigate to the 'Upload & Analyze' page</li>
-            <li>Upload your chat file (.txt format)</li>
-            <li>Select user for analysis (or choose 'Overall' for group analysis)</li>
-            <li>Explore the comprehensive insights and visualizations</li>
-            <li>Download your analysis report in PDF format</li>
-        </ol>
-        
-        <div class="team-section">
-            <h3>👥 Project Team</h3>
-            <div class="team-members">
-                <div class="team-member">
-                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Satyam Govind Yadav</h4>
-                    <p style="color: var(--text-secondary); margin: 0;">Lead Developer & ML Engineer</p>
-                    <div class="member-links" style="margin-top: 1rem;">
-                        <a href="https://github.com/satyamyadav6286" target="_blank" title="GitHub">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
-                        </a>
-                        <a href="https://www.linkedin.com/in/satyamgovindyadav/" target="_blank" title="LinkedIn">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
-                        </a>
-                    </div>
-                </div>
-                <div class="team-member">
-                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Arunkumar Gupta</h4>
-                    <p style="color: var(--text-secondary); margin: 0;">UI/UX Designer & Developer</p>
-                    <div class="member-links" style="margin-top: 1rem;">
-                        <a href="https://github.com/arun-060" target="_blank" title="GitHub">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
-                        </a>
-                        <a href="https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/" target="_blank" title="LinkedIn">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <h3>🛠️ Technology Stack</h3>
-        <ul style="color: var(--text-secondary); line-height: 1.6;">
-            <li><strong>Frontend:</strong> Streamlit, HTML/CSS, JavaScript</li>
-            <li><strong>Backend:</strong> Python, Pandas, NumPy</li>
-            <li><strong>Machine Learning:</strong> Natural Language Processing, Sentiment Analysis</li>
-            <li><strong>Visualization:</strong> Plotly, Matplotlib, Seaborn</li>
-            <li><strong>Data Processing:</strong> Text preprocessing, Emoji analysis, Word cloud generation</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+        [![LinkedIn](https://img.icons8.com/ios-filled/20/000000/linkedin.png)](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/) [LinkedIn](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/)
+        """)
+    
+    st.markdown("### 🛠️ Technology Stack")
+    st.markdown("""
+    - **Frontend:** Streamlit, HTML/CSS, JavaScript
+    - **Backend:** Python, Pandas, NumPy
+    - **Machine Learning:** Natural Language Processing, Sentiment Analysis
+    - **Visualization:** Plotly, Matplotlib, Seaborn
+    - **Data Processing:** Text preprocessing, Emoji analysis, Word cloud generation
+    """)
     
     # Add footer to the about page
     footer()

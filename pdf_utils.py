@@ -24,30 +24,43 @@ class PDF(FPDF):
         # Page number
         self.cell(0, 10, f'Page {self.page_no()}/{{nb}}', 0, 0, 'C')
 
-def create_pdf_report(analysis_data, output_path='chat_analysis_report.pdf'):
+def create_pdf_report(df, selected_user, num_messages, words, num_media_messages, num_links):
     """
     Create a PDF report from the analysis data
     
     Args:
-        analysis_data (dict): Dictionary containing analysis results
-        output_path (str): Path to save the PDF file
+        df: DataFrame containing chat data
+        selected_user: User selected for analysis
+        num_messages: Total number of messages
+        words: Total number of words
+        num_media_messages: Number of media messages
+        num_links: Number of links shared
         
     Returns:
-        str: Path to the generated PDF file
+        BytesIO: PDF buffer
     """
+    from io import BytesIO
+    
     pdf = PDF()
     pdf.alias_nb_pages()
     pdf.add_page()
     
     # Set font for the title
     pdf.set_font('Arial', 'B', 16)
-    pdf.cell(0, 10, 'Chat Analysis Report', 0, 1, 'C')
+    pdf.cell(0, 10, 'EchoMind - Chat Analysis Report', 0, 1, 'C')
     pdf.ln(10)
     
-    # Add analysis date
+    # Add analysis date and user info
     pdf.set_font('Arial', 'I', 10)
     pdf.cell(0, 10, f'Generated on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}', 0, 1, 'R')
+    pdf.cell(0, 10, f'Analysis for: {selected_user}', 0, 1, 'R')
     pdf.ln(5)
+    
+    # Calculate additional statistics
+    total_days = (df['date'].max() - df['date'].min()).days + 1 if len(df) > 0 else 0
+    avg_messages_per_day = num_messages / total_days if total_days > 0 else 0
+    avg_words_per_message = words / num_messages if num_messages > 0 else 0
+    media_ratio = (num_media_messages/num_messages*100) if num_messages > 0 else 0
     
     # Add basic statistics
     pdf.set_font('Arial', 'B', 12)
@@ -59,13 +72,14 @@ def create_pdf_report(analysis_data, output_path='chat_analysis_report.pdf'):
     row_height = pdf.font_size * 2
     
     stats = [
-        ['Total Messages', analysis_data.get('total_messages', 'N/A')],
-        ['Total Words', analysis_data.get('total_words', 'N/A')],
-        ['Media Shared', analysis_data.get('media_shared', 'N/A')],
-        ['Links Shared', analysis_data.get('links_shared', 'N/A')],
-        ['Most Active User', analysis_data.get('most_active_user', 'N/A')],
-        ['Most Active Day', analysis_data.get('most_active_day', 'N/A')],
-        ['Most Active Hour', analysis_data.get('most_active_hour', 'N/A')],
+        ['Total Messages', f'{num_messages:,}'],
+        ['Total Words', f'{words:,}'],
+        ['Media Shared', f'{num_media_messages:,}'],
+        ['Links Shared', f'{num_links:,}'],
+        ['Total Days', f'{total_days}'],
+        ['Avg Messages/Day', f'{avg_messages_per_day:.1f}'],
+        ['Avg Words/Message', f'{avg_words_per_message:.1f}'],
+        ['Media Ratio', f'{media_ratio:.1f}%'],
     ]
     
     for row in stats:
@@ -79,32 +93,46 @@ def create_pdf_report(analysis_data, output_path='chat_analysis_report.pdf'):
     pdf.cell(0, 10, 'Analysis Details', 0, 1)
     pdf.set_font('Arial', '', 10)
     
-    # Add word cloud image if available
-    if 'wordcloud_path' in analysis_data and os.path.exists(analysis_data['wordcloud_path']):
-        pdf.image(analysis_data['wordcloud_path'], x=10, y=pdf.get_y(), w=180)
-        pdf.ln(100)  # Adjust based on image height
+    # Add project information
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, 'Project Information', 0, 1)
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(0, 10, 'EchoMind - Decoding Conversations with Machine Learning', 0, 1)
+    pdf.cell(0, 10, 'Developed by: Satyam Govind Yadav & Arunkumar Gupta', 0, 1)
+    pdf.ln(5)
     
-    # Add most common words
-    if 'common_words' in analysis_data and analysis_data['common_words']:
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 10, 'Most Common Words', 0, 1)
-        pdf.set_font('Arial', '', 10)
-        
-        for i, (word, count) in enumerate(analysis_data['common_words'].items(), 1):
-            pdf.cell(0, 10, f'{i}. {word}: {count}', 0, 1)
+    # Add insights section
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, 'Key Insights', 0, 1)
+    pdf.set_font('Arial', '', 10)
     
-    # Add emoji analysis
-    if 'top_emojis' in analysis_data and analysis_data['top_emojis']:
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 10, 'Top Emojis', 0, 1)
-        pdf.set_font('Arial', '', 10)
-        
-        for i, (emoji, count) in enumerate(analysis_data['top_emojis'].items(), 1):
-            pdf.cell(0, 10, f'{i}. {emoji}: {count} times', 0, 1)
+    insights = []
+    if avg_messages_per_day > 50:
+        insights.append("High daily message activity detected")
+    if media_ratio > 20:
+        insights.append("High media sharing activity")
+    if avg_words_per_message > 10:
+        insights.append("Detailed conversations with longer messages")
+    if total_days > 30:
+        insights.append("Long-term conversation analysis")
     
-    # Save the PDF
-    pdf.output(output_path, 'F')
-    return output_path
+    if insights:
+        for insight in insights:
+            pdf.cell(0, 10, f'• {insight}', 0, 1)
+    else:
+        pdf.cell(0, 10, '• Standard conversation patterns observed', 0, 1)
+    
+    # Add footer
+    pdf.add_page()
+    pdf.set_font('Arial', 'I', 8)
+    pdf.cell(0, 10, 'Report generated by EchoMind - Advanced Conversation Analysis Platform', 0, 1, 'C')
+    pdf.cell(0, 10, 'Made with ❤️ by Satyam Govind Yadav & Arunkumar Gupta', 0, 1, 'C')
+    
+    # Return PDF as BytesIO buffer
+    buffer = BytesIO()
+    pdf.output(buffer, 'S')
+    buffer.seek(0)
+    return buffer
 
 def get_binary_file_downloader_html(bin_file, file_label='File'):
     """

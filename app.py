@@ -257,17 +257,17 @@ elif st.session_state.current_page == "upload":
             if user_heatmap is not None and not user_heatmap.empty:
                 try:
                     fig = px.imshow(user_heatmap.values,
-                          labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
-                          x=[f"{h:02d}:00" for h in range(24)],
-                          y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                                  labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
+                                  x=[f"{h:02d}:00" for h in range(24)],
+                                  y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                                   color_continuous_scale='Viridis',
                                   template='plotly_dark')
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                            paper_bgcolor='rgba(0,0,0,0)',
+                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                    paper_bgcolor='rgba(0,0,0,0)',
                                     xaxis=dict(showgrid=False, color='#b8b8b8'),
                                     yaxis=dict(showgrid=False, color='#b8b8b8'),
                                     font=dict(color='#ffffff'))
-            st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True)
                 except Exception as e:
                     st.warning("Unable to display heatmap. Data may be insufficient.")
             else:
@@ -448,10 +448,6 @@ elif st.session_state.current_page == "upload":
             st.markdown("Share your chat analysis with others!")
             
             # Generate QR code for the app URL
-            import qrcode
-            from PIL import Image
-            import io
-            
             # Create QR code
             qr = qrcode.QRCode(version=1, box_size=10, border=5)
             qr.add_data("https://echomind-app.streamlit.app/")
@@ -532,10 +528,6 @@ elif st.session_state.current_page == "about":
     st.markdown("Scan this QR code to share EchoMind with others!")
     
     # Generate QR code for the app URL
-    import qrcode
-    from PIL import Image
-    import io
-    
     # Create QR code
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data("https://echomind-app.streamlit.app/")

@@ -93,12 +93,12 @@ streamlit run app.py
 ### Satyam Govind Yadav
 - **Role**: Lead Developer & ML Engineer
 - **GitHub**: [@satyamyadav6286](https://github.com/satyamyadav6286)
-- **LinkedIn**: [Satyam Yadav](https://linkedin.com/in/satyamyadav)
+- **LinkedIn**: [Satyam Govind Yadav](https://www.linkedin.com/in/satyamgovindyadav/)
 
 ### Arunkumar Gupta
 - **Role**: UI/UX Designer & Developer
-- **GitHub**: [@arungupta](https://github.com/arungupta)
-- **LinkedIn**: [Arunkumar Gupta](https://linkedin.com/in/arungupta)
+- **GitHub**: [@arun-060](https://github.com/arun-060)
+- **LinkedIn**: [Arunkumar Gupta](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/)
 
 ## 📁 Project Structure
 

@@ -115,7 +115,7 @@ def footer():
                         <a href="https://github.com/satyamyadav6286" target="_blank" title="GitHub">
                             <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
                         </a>
-                        <a href="https://linkedin.com/in/satyamyadav" target="_blank" title="LinkedIn">
+                        <a href="https://www.linkedin.com/in/satyamgovindyadav/" target="_blank" title="LinkedIn">
                             <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
                         </a>
                     </div>
@@ -123,10 +123,10 @@ def footer():
                 <div class="team-member">
                     <p>Arunkumar Gupta</p>
                     <div class="member-links">
-                        <a href="https://github.com/arungupta" target="_blank" title="GitHub">
+                        <a href="https://github.com/arun-060" target="_blank" title="GitHub">
                             <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
                         </a>
-                        <a href="https://linkedin.com/in/arungupta" target="_blank" title="LinkedIn">
+                        <a href="https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/" target="_blank" title="LinkedIn">
                             <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
                         </a>
                     </div>
@@ -485,7 +485,7 @@ elif selected == "ℹ️ About":
                         <a href="https://github.com/satyamyadav6286" target="_blank" title="GitHub">
                             <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
                         </a>
-                        <a href="https://linkedin.com/in/satyamyadav" target="_blank" title="LinkedIn">
+                        <a href="https://www.linkedin.com/in/satyamgovindyadav/" target="_blank" title="LinkedIn">
                             <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
                         </a>
                     </div>
@@ -494,10 +494,10 @@ elif selected == "ℹ️ About":
                     <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Arunkumar Gupta</h4>
                     <p style="color: var(--text-secondary); margin: 0;">UI/UX Designer & Developer</p>
                     <div class="member-links" style="margin-top: 1rem;">
-                        <a href="https://github.com/arungupta" target="_blank" title="GitHub">
+                        <a href="https://github.com/arun-060" target="_blank" title="GitHub">
                             <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
                         </a>
-                        <a href="https://linkedin.com/in/arungupta" target="_blank" title="LinkedIn">
+                        <a href="https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/" target="_blank" title="LinkedIn">
                             <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
                         </a>
                     </div>

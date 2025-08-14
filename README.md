@@ -176,7 +176,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 - **Project Link**: [https://github.com/satyamyadav6286/EchoMind---Decoding-Conversations-with-ML](https://github.com/satyamyadav6286/EchoMind---Decoding-Conversations-with-ML)
-- **Live Demo**: [https://echomind.streamlit.app]([https://echomind.streamlit.app](https://echomind---decoding-conversations-with-ml.streamlit.app/))
+- **Live Demo**: https://echomind---decoding-conversations-with-ml.streamlit.app/
 
 ---
 

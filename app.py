@@ -62,46 +62,24 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    # Add sidebar toggle button
-    if st.button("☰ Toggle Sidebar", key="sidebar_toggle"):
-        st.session_state.sidebar_expanded = not st.session_state.get('sidebar_expanded', True)
+    # Always show navigation menu
+    selected = option_menu(
+        menu_title=None,
+        options=["🏠 Home", "📊 Upload & Analyze", "ℹ️ About"],
+        icons=["house", "cloud-upload", "info-circle"],
+        default_index=0,
+        styles={
+            "container": {"padding": "0!important", "background-color": "#1a1a2e"},
+            "icon": {"color": "#4f46e5", "font-size": "18px"}, 
+            "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "--hover-color": "#16213e", "color": "#ffffff"},
+            "nav-link-selected": {"background-color": "#4f46e5"},
+        }
+    )
+    
+    # Update session state when navigation changes
+    if selected != st.session_state.page:
+        st.session_state.page = selected
         st.rerun()
-    
-    # Initialize sidebar state
-    if 'sidebar_expanded' not in st.session_state:
-        st.session_state.sidebar_expanded = True
-    
-    # Show navigation only if sidebar is expanded
-    if st.session_state.sidebar_expanded:
-        selected = option_menu(
-            menu_title=None,
-            options=["🏠 Home", "📊 Upload & Analyze", "ℹ️ About"],
-            icons=["house", "cloud-upload", "info-circle"],
-            default_index=0,
-            styles={
-                "container": {"padding": "0!important", "background-color": "#1a1a2e"},
-                "icon": {"color": "#4f46e5", "font-size": "18px"}, 
-                "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "--hover-color": "#16213e", "color": "#ffffff"},
-                "nav-link-selected": {"background-color": "#4f46e5"},
-            }
-        )
-        
-        # Update session state when navigation changes
-        if selected != st.session_state.page:
-            st.session_state.page = selected
-            st.rerun()
-    else:
-        # If sidebar is collapsed, show a simple menu
-        st.markdown("### Navigation")
-        if st.button("🏠 Home", key="nav_home"):
-            st.session_state.page = "🏠 Home"
-            st.rerun()
-        if st.button("📊 Upload & Analyze", key="nav_upload"):
-            st.session_state.page = "📊 Upload & Analyze"
-            st.rerun()
-        if st.button("ℹ️ About", key="nav_about"):
-            st.session_state.page = "ℹ️ About"
-            st.rerun()
 
 
 

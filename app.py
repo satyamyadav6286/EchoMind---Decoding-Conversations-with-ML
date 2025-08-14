@@ -32,6 +32,15 @@ def local_css(file_name):
 # Load custom CSS
 local_css("style.css")
 
+# Simple footer function without HTML
+def simple_footer():
+    st.markdown("---")
+    st.markdown("### 🧠 EchoMind - Decoding Conversations with ML")
+    st.markdown("**Developed by:** Satyam Govind Yadav & Arunkumar Gupta")
+    st.markdown("**GitHub:** [satyamyadav6286](https://github.com/satyamyadav6286) | [arun-060](https://github.com/arun-060)")
+    st.markdown("**LinkedIn:** [Satyam Govind Yadav](https://www.linkedin.com/in/satyamgovindyadav/) | [Arunkumar Gupta](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/)")
+    st.markdown(f"© {datetime.now().year} EchoMind. Made with ❤️ by Satyam Govind Yadav & Arunkumar Gupta")
+
 # Header Section
 st.markdown("""
     <div class="main-header">
@@ -62,90 +71,9 @@ with st.sidebar:
         }
     )
 
-def get_share_buttons():
-    """Generate HTML for social sharing buttons"""
-    current_url = "https://echomind.streamlit.app"  # Replace with your actual URL when deployed
-    share_text = "Check out EchoMind - Decoding Conversations with Machine Learning!"
-    
-    twitter_url = f"https://twitter.com/intent/tweet?url={current_url}&text={share_text}"
-    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={current_url}"
-    
-    return f"""
-    <div class="share-buttons">
-        <a href="{twitter_url}" target="_blank" class="share-btn" title="Share on Twitter">
-            <img src="https://img.icons8.com/ios/24/000000/twitter--v1.png" alt="Twitter"/>
-        </a>
-        <a href="{linkedin_url}" target="_blank" class="share-btn" title="Share on LinkedIn">
-            <img src="https://img.icons8.com/ios/24/000000/linkedin.png" alt="LinkedIn"/>
-        </a>
-        <a href="#" id="copyLinkBtn" class="share-btn" title="Copy link to clipboard">
-            <img src="https://img.icons8.com/ios/24/000000/link--v1.png" alt="Copy link"/>
-        </a>
-    </div>
-    <script>
-    document.getElementById('copyLinkBtn').addEventListener('click', function(e) {{
-        e.preventDefault();
-        navigator.clipboard.writeText('{current_url}').then(function() {{
-            const icon = document.querySelector('#copyLinkBtn img');
-            const originalSrc = icon.src;
-            icon.src = 'https://img.icons8.com/ios/24/4CAF50/checkmark--v1.png';
-            setTimeout(() => {{
-                icon.src = originalSrc;
-            }}, 2000);
-        }});
-    }});
-    </script>
-    """
 
-def footer():
-    """Render the footer with team info and social links"""
-    st.markdown("""
-    <div class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🧠 EchoMind</h3>
-                <p>Advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.</p>
-                """ + get_share_buttons() + """
-            </div>
-            <div class="footer-section">
-                <h4>👥 Project Team</h4>
-                <div class="team-member">
-                    <p>Satyam Govind Yadav</p>
-                    <div class="member-links">
-                        <a href="https://github.com/satyamyadav6286" target="_blank" title="GitHub">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
-                        </a>
-                        <a href="https://www.linkedin.com/in/satyamgovindyadav/" target="_blank" title="LinkedIn">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
-                        </a>
-                    </div>
-                </div>
-                <div class="team-member">
-                    <p>Arunkumar Gupta</p>
-                    <div class="member-links">
-                        <a href="https://github.com/arun-060" target="_blank" title="GitHub">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/github.png" alt="GitHub"/>
-                        </a>
-                        <a href="https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/" target="_blank" title="LinkedIn">
-                            <img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png" alt="LinkedIn"/>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4>🔗 Quick Links</h4>
-                <ul style="list-style: none; padding: 0; color: #b8b8b8;">
-                    <li style="margin-bottom: 0.5rem;">🏠 Home</li>
-                    <li style="margin-bottom: 0.5rem;">📊 Upload & Analyze</li>
-                    <li style="margin-bottom: 0.5rem;">ℹ️ About</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; """ + str(datetime.now().year) + """ EchoMind. Made with ❤️ by Satyam Govind Yadav & Arunkumar Gupta</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+
+
 
 # Home Page
 if selected == "🏠 Home":
@@ -191,6 +119,9 @@ if selected == "🏠 Home":
     
     if st.button("📤 Upload Chat Data", type="primary"):
         st.switch_page("📊 Upload & Analyze")
+    
+    # Add simple footer
+    simple_footer()
 
 # Upload & Analyze Page
 elif selected == "📊 Upload & Analyze":
@@ -509,8 +440,33 @@ elif selected == "📊 Upload & Analyze":
                     mime="application/pdf"
                 )
             
-            # Add footer to the analysis page
-            footer()
+            # Add QR Code for sharing
+            st.markdown("### 📱 Share Your Analysis")
+            st.markdown("Share your chat analysis with others!")
+            
+            # Generate QR code for the app URL
+            import qrcode
+            from PIL import Image
+            import io
+            
+            # Create QR code
+            qr = qrcode.QRCode(version=1, box_size=10, border=5)
+            qr.add_data("https://echomind.streamlit.app")
+            qr.make(fit=True)
+            
+            # Create QR code image
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+            
+            # Convert to bytes for display
+            img_buffer = io.BytesIO()
+            qr_img.save(img_buffer, format='PNG')
+            img_buffer.seek(0)
+            
+            # Display QR code
+            st.image(img_buffer, caption="Scan to share EchoMind", width=200)
+            
+            # Add simple footer
+            simple_footer()
 
 # About Page
 elif selected == "ℹ️ About":
@@ -569,5 +525,30 @@ elif selected == "ℹ️ About":
     - **Data Processing:** Text preprocessing, Emoji analysis, Word cloud generation
     """)
     
-    # Add footer to the about page
-    footer()
+    # Add QR Code for sharing (optional)
+    st.markdown("### 📱 Share EchoMind")
+    st.markdown("Scan this QR code to share EchoMind with others!")
+    
+    # Generate QR code for the app URL
+    import qrcode
+    from PIL import Image
+    import io
+    
+    # Create QR code
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data("https://echomind.streamlit.app")
+    qr.make(fit=True)
+    
+    # Create QR code image
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to bytes for display
+    img_buffer = io.BytesIO()
+    qr_img.save(img_buffer, format='PNG')
+    img_buffer.seek(0)
+    
+    # Display QR code
+    st.image(img_buffer, caption="Scan to share EchoMind", width=200)
+    
+    # Add simple footer
+    simple_footer()

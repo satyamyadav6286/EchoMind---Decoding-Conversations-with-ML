@@ -49,8 +49,9 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sidebar with navigation
+# Sidebar with navigation - ALWAYS VISIBLE
 with st.sidebar:
+    # EchoMind Logo and Title
     st.markdown("""
     <div style="text-align: center; margin-bottom: 2rem;">
         <h3 style="color: #4f46e5; margin-bottom: 0.5rem;">🧠 EchoMind</h3>
@@ -58,7 +59,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    # Always show navigation menu
+    # Navigation Menu
     selected = option_menu(
         menu_title=None,
         options=["🏠 Home", "📊 Upload & Analyze", "ℹ️ About"],
@@ -72,16 +73,10 @@ with st.sidebar:
         }
     )
 
-
-
-
-
-# Home Page
+# Main Content Area
 if selected == "🏠 Home":
-    # Use container to ensure full visibility
-    with st.container():
-        st.markdown("## Welcome to EchoMind")
-        st.markdown("Your advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.")
+    st.markdown("## Welcome to EchoMind")
+    st.markdown("Your advanced conversation analysis platform powered by Machine Learning. Gain deep insights from your chat data with beautiful visualizations and comprehensive analytics.")
     
     st.markdown("### 🚀 Key Features")
     
@@ -126,16 +121,9 @@ if selected == "🏠 Home":
     # Add simple footer
     simple_footer()
 
-# Upload & Analyze Page
 elif selected == "📊 Upload & Analyze":
-    # Use container to ensure full visibility
-    with st.container():
-        st.markdown("""
-        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: var(--text-primary); margin-bottom: 1rem;">📊 Upload & Analyze Your Chat</h2>
-            <p style="color: var(--text-secondary);">Upload your exported chat file to begin comprehensive analysis.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("## 📊 Upload & Analyze Your Chat")
+    st.markdown("Upload your exported chat file to begin comprehensive analysis.")
     
     uploaded_file = st.file_uploader("Choose a chat file", type=['txt'], key="file_uploader")
     
@@ -158,7 +146,7 @@ elif selected == "📊 Upload & Analyze":
         user_list.sort()
         user_list.insert(0, "Overall")
         
-        # Sidebar for analysis options
+        # Analysis options in sidebar
         st.sidebar.markdown("### 📋 Analysis Options")
         selected_user = st.sidebar.selectbox("Select User for Analysis", user_list)
         
@@ -484,89 +472,86 @@ elif selected == "📊 Upload & Analyze":
             # Add simple footer
             simple_footer()
 
-# About Page
 elif selected == "ℹ️ About":
-    # Use container to ensure full visibility
-    with st.container():
-        st.markdown("## About EchoMind")
-        st.markdown("EchoMind is an advanced conversation analysis platform that helps you gain deep insights from your chat data using Machine Learning and Data Visualization techniques. Our platform provides comprehensive analytics to understand conversation patterns, sentiment, and engagement metrics.")
-        
-        st.markdown("### 🚀 Key Features")
+    st.markdown("## About EchoMind")
+    st.markdown("EchoMind is an advanced conversation analysis platform that helps you gain deep insights from your chat data using Machine Learning and Data Visualization techniques. Our platform provides comprehensive analytics to understand conversation patterns, sentiment, and engagement metrics.")
+    
+    st.markdown("### 🚀 Key Features")
+    st.markdown("""
+    - 📊 Detailed conversation statistics and analytics
+    - 📅 Timeline analysis of message frequency
+    - 📈 Activity patterns and trends visualization
+    - 📝 Interactive word cloud generation
+    - 😊 Comprehensive emoji analysis
+    - 👥 User activity comparison (for group chats)
+    - 🔥 Activity heatmaps for time-based insights
+    - 📄 PDF report generation and download
+    """)
+    
+    st.markdown("### 📋 How to Use")
+    st.markdown("""
+    1. Export your WhatsApp chat (without media)
+    2. Navigate to the 'Upload & Analyze' page
+    3. Upload your chat file (.txt format)
+    4. Select user for analysis (or choose 'Overall' for group analysis)
+    5. Explore the comprehensive insights and visualizations
+    6. Download your analysis report in PDF format
+    """)
+    
+    st.markdown("### 👥 Project Team")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("#### Satyam Govind Yadav")
+        st.markdown("**Lead Developer & ML Engineer**")
         st.markdown("""
-        - 📊 Detailed conversation statistics and analytics
-        - 📅 Timeline analysis of message frequency
-        - 📈 Activity patterns and trends visualization
-        - 📝 Interactive word cloud generation
-        - 😊 Comprehensive emoji analysis
-        - 👥 User activity comparison (for group chats)
-        - 🔥 Activity heatmaps for time-based insights
-        - 📄 PDF report generation and download
-        """)
+        **GitHub:** [satyamyadav6286](https://github.com/satyamyadav6286)
         
-        st.markdown("### 📋 How to Use")
+        **LinkedIn:** [Satyam Govind Yadav](https://www.linkedin.com/in/satyamgovindyadav/)
+        """)
+    
+    with col2:
+        st.markdown("#### Arunkumar Gupta")
+        st.markdown("**UI/UX Designer & Developer**")
         st.markdown("""
-        1. Export your WhatsApp chat (without media)
-        2. Navigate to the 'Upload & Analyze' page
-        3. Upload your chat file (.txt format)
-        4. Select user for analysis (or choose 'Overall' for group analysis)
-        5. Explore the comprehensive insights and visualizations
-        6. Download your analysis report in PDF format
+        **GitHub:** [arun-060](https://github.com/arun-060)
+        
+        **LinkedIn:** [Arunkumar Gupta](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/)
         """)
-        
-        st.markdown("### 👥 Project Team")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("#### Satyam Govind Yadav")
-            st.markdown("**Lead Developer & ML Engineer**")
-            st.markdown("""
-            **GitHub:** [satyamyadav6286](https://github.com/satyamyadav6286)
-            
-            **LinkedIn:** [Satyam Govind Yadav](https://www.linkedin.com/in/satyamgovindyadav/)
-            """)
-        
-        with col2:
-            st.markdown("#### Arunkumar Gupta")
-            st.markdown("**UI/UX Designer & Developer**")
-            st.markdown("""
-            **GitHub:** [arun-060](https://github.com/arun-060)
-            
-            **LinkedIn:** [Arunkumar Gupta](https://www.linkedin.com/in/arunkumar-gupta-b62b0428b/)
-            """)
-        
-        st.markdown("### 🛠️ Technology Stack")
-        st.markdown("""
-        - **Frontend:** Streamlit, HTML/CSS, JavaScript
-        - **Backend:** Python, Pandas, NumPy
-        - **Machine Learning:** Natural Language Processing, Sentiment Analysis
-        - **Visualization:** Plotly, Matplotlib, Seaborn
-        - **Data Processing:** Text preprocessing, Emoji analysis, Word cloud generation
-        """)
-        
-        # Add QR Code for sharing (optional)
-        st.markdown("### 📱 Share EchoMind")
-        st.markdown("Scan this QR code to share EchoMind with others!")
-        
-        # Generate QR code for the app URL
-        import qrcode
-        from PIL import Image
-        import io
-        
-        # Create QR code
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data("https://echomind.streamlit.app")
-        qr.make(fit=True)
-        
-        # Create QR code image
-        qr_img = qr.make_image(fill_color="black", back_color="white")
-        
-        # Convert to bytes for display
-        img_buffer = io.BytesIO()
-        qr_img.save(img_buffer, format='PNG')
-        img_buffer.seek(0)
-        
-        # Display QR code
-        st.image(img_buffer, caption="Scan to share EchoMind", width=200)
-        
-        # Add simple footer
-        simple_footer()
+    
+    st.markdown("### 🛠️ Technology Stack")
+    st.markdown("""
+    - **Frontend:** Streamlit, HTML/CSS, JavaScript
+    - **Backend:** Python, Pandas, NumPy
+    - **Machine Learning:** Natural Language Processing, Sentiment Analysis
+    - **Visualization:** Plotly, Matplotlib, Seaborn
+    - **Data Processing:** Text preprocessing, Emoji analysis, Word cloud generation
+    """)
+    
+    # Add QR Code for sharing (optional)
+    st.markdown("### 📱 Share EchoMind")
+    st.markdown("Scan this QR code to share EchoMind with others!")
+    
+    # Generate QR code for the app URL
+    import qrcode
+    from PIL import Image
+    import io
+    
+    # Create QR code
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data("https://echomind.streamlit.app")
+    qr.make(fit=True)
+    
+    # Create QR code image
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to bytes for display
+    img_buffer = io.BytesIO()
+    qr_img.save(img_buffer, format='PNG')
+    img_buffer.seek(0)
+    
+    # Display QR code
+    st.image(img_buffer, caption="Scan to share EchoMind", width=200)
+    
+    # Add simple footer
+    simple_footer()

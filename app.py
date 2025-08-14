@@ -14,6 +14,8 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 from pdf_utils import create_pdf_report, get_binary_file_downloader_html
+import qrcode
+from PIL import Image
 
 # Set page configuration
 st.set_page_config(

@@ -96,7 +96,7 @@ if st.session_state.current_page == "home":
         """)
     
     with col2:
-    st.markdown("""
+        st.markdown("""
         **📝 Word Cloud**
         
         Visual representation of the most frequently used words in your conversations.

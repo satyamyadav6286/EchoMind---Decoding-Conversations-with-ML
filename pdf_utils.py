@@ -2,6 +2,12 @@ from fpdf import FPDF
 import os
 import base64
 from datetime import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+from io import BytesIO
+import tempfile
 
 class PDF(FPDF):
     def header(self):
@@ -28,9 +34,131 @@ class PDF(FPDF):
         # Page number
         self.cell(0, 10, f'Page {self.page_no()}/{{nb}}', 0, 0, 'C')
 
+def create_visualization_charts(df, selected_user, helper_module):
+    """Create visualization charts and return as image files"""
+    charts = {}
+    
+    try:
+        # Set style for better looking charts
+        plt.style.use('default')
+        sns.set_palette("husl")
+        
+        # 1. Monthly Timeline
+        timeline = helper_module.monthly_timeline(selected_user, df)
+        if not timeline.empty:
+            fig, ax = plt.subplots(figsize=(10, 6))
+            timeline.plot(kind='line', ax=ax, color='#4f46e5', linewidth=2)
+            ax.set_title('Monthly Message Activity', fontsize=14, fontweight='bold')
+            ax.set_xlabel('Month')
+            ax.set_ylabel('Number of Messages')
+            ax.grid(True, alpha=0.3)
+            plt.tight_layout()
+            
+            # Save to bytes
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['monthly_timeline'] = img_buffer
+            plt.close()
+        
+        # 2. Daily Activity
+        daily_timeline = helper_module.daily_timeline(selected_user, df)
+        if not daily_timeline.empty:
+            fig, ax = plt.subplots(figsize=(10, 6))
+            daily_timeline.plot(kind='area', ax=ax, color='#7c3aed', alpha=0.7)
+            ax.set_title('Daily Message Activity', fontsize=14, fontweight='bold')
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Number of Messages')
+            ax.grid(True, alpha=0.3)
+            plt.tight_layout()
+            
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['daily_timeline'] = img_buffer
+            plt.close()
+        
+        # 3. Weekly Activity
+        busy_day = helper_module.week_activity_map(selected_user, df)
+        if not busy_day.empty:
+            fig, ax = plt.subplots(figsize=(8, 6))
+            busy_day.plot(kind='bar', ax=ax, color='#4f46e5')
+            ax.set_title('Most Active Day of Week', fontsize=14, fontweight='bold')
+            ax.set_xlabel('Day of Week')
+            ax.set_ylabel('Number of Messages')
+            ax.grid(True, alpha=0.3)
+            plt.tight_layout()
+            
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['weekly_activity'] = img_buffer
+            plt.close()
+        
+        # 4. Monthly Activity
+        busy_month = helper_module.month_activity_map(selected_user, df)
+        if not busy_month.empty:
+            fig, ax = plt.subplots(figsize=(8, 6))
+            busy_month.plot(kind='bar', ax=ax, color='#7c3aed')
+            ax.set_title('Most Active Month', fontsize=14, fontweight='bold')
+            ax.set_xlabel('Month')
+            ax.set_ylabel('Number of Messages')
+            ax.grid(True, alpha=0.3)
+            plt.tight_layout()
+            
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['monthly_activity'] = img_buffer
+            plt.close()
+        
+        # 5. Most Common Words (if available)
+        most_common_df = helper_module.most_common_words(selected_user, df)
+        if not most_common_df.empty and len(most_common_df) > 0:
+            fig, ax = plt.subplots(figsize=(10, 8))
+            top_words = most_common_df.head(15)
+            y_pos = np.arange(len(top_words))
+            ax.barh(y_pos, top_words[1], color='#10b981')
+            ax.set_yticks(y_pos)
+            ax.set_yticklabels(top_words[0])
+            ax.set_xlabel('Frequency')
+            ax.set_title('Most Common Words', fontsize=14, fontweight='bold')
+            ax.invert_yaxis()
+            plt.tight_layout()
+            
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['common_words'] = img_buffer
+            plt.close()
+        
+        # 6. Emoji Analysis (if available)
+        emoji_df = helper_module.emoji_helper(selected_user, df)
+        if not emoji_df.empty and len(emoji_df) > 0:
+            fig, ax = plt.subplots(figsize=(8, 6))
+            top_emojis = emoji_df.head(10)
+            ax.bar(range(len(top_emojis)), top_emojis[1], color='#f59e0b')
+            ax.set_title('Top Emojis Used', fontsize=14, fontweight='bold')
+            ax.set_xlabel('Emoji')
+            ax.set_ylabel('Frequency')
+            ax.set_xticks(range(len(top_emojis)))
+            ax.set_xticklabels(top_emojis[0], fontsize=12)
+            plt.tight_layout()
+            
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+            img_buffer.seek(0)
+            charts['emoji_analysis'] = img_buffer
+            plt.close()
+            
+    except Exception as e:
+        print(f"Error creating charts: {e}")
+    
+    return charts
+
 def create_pdf_report(df, selected_user, num_messages, words, num_media_messages, num_links):
     """
-    Create a PDF report from the analysis data
+    Create a PDF report from the analysis data with visualizations
     
     Args:
         df: DataFrame containing chat data
@@ -44,6 +172,7 @@ def create_pdf_report(df, selected_user, num_messages, words, num_media_messages
         BytesIO: PDF buffer
     """
     from io import BytesIO
+    import helper
 
     pdf = PDF()
     pdf.alias_nb_pages()
@@ -90,6 +219,41 @@ def create_pdf_report(df, selected_user, num_messages, words, num_media_messages
         pdf.cell(col_width, row_height, str(row[0]), border=1)
         pdf.cell(col_width, row_height, str(row[1]), border=1)
         pdf.ln(row_height)
+
+    # Create visualizations
+    charts = create_visualization_charts(df, selected_user, helper)
+    
+    # Add visualizations to PDF
+    if charts:
+        pdf.add_page()
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(0, 10, 'Visual Analysis', 0, 1, 'C')
+        pdf.ln(5)
+        
+        # Add charts
+        for chart_name, chart_buffer in charts.items():
+            try:
+                # Save chart to temporary file
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
+                    tmp_file.write(chart_buffer.getvalue())
+                    tmp_file_path = tmp_file.name
+                
+                # Add chart to PDF
+                pdf.set_font('Arial', 'B', 12)
+                chart_title = chart_name.replace('_', ' ').title()
+                pdf.cell(0, 10, chart_title, 0, 1)
+                pdf.ln(2)
+                
+                # Add image (centered, max width 180mm)
+                pdf.image(tmp_file_path, x=10, y=None, w=180)
+                pdf.ln(5)
+                
+                # Clean up temporary file
+                os.unlink(tmp_file_path)
+                
+            except Exception as e:
+                print(f"Error adding chart {chart_name}: {e}")
+                continue
 
     # Add analysis sections
     pdf.add_page()

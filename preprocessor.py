@@ -2,7 +2,7 @@ import re
 import pandas as pd
 
 def preprocess(data):
-    pattern = '\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+    pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
 
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
@@ -10,14 +10,15 @@ def preprocess(data):
     df = pd.DataFrame({'user_message': messages, 'message_date': dates})
     # convert message_date type
     df['message_date'] = df['message_date'].astype(str).str.strip()
-    df['message_date'] = pd.to_datetime(df['message_date'], errors='coerce', infer_datetime_format=True)
+    # Note: If date formats are highly variable, fallback to dateutil may cause inconsistencies.
+    df['message_date'] = pd.to_datetime(df['message_date'], errors='coerce')
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
     users = []
     messages = []
     for message in df['user_message']:
-        entry = re.split('([\w\W]+?):\s', message)
+        entry = re.split(r'([\w\W]+?):\s', message)
         if entry[1:]:  # user name
             users.append(entry[1])
             messages.append(" ".join(entry[2:]))

@@ -140,347 +140,352 @@ elif st.session_state.current_page == "upload":
         bytes_data = uploaded_file.getvalue()
         data = bytes_data.decode("utf-8")
         df = preprocessor.preprocess(data)
-
-        # Fetch unique users
-        user_list = df['user'].unique().tolist()
-        if 'group_notification' in user_list:
-            user_list.remove('group_notification')
-        user_list.sort()
-        user_list.insert(0, "Overall")
-        
-        # Analysis options in sidebar
-        st.sidebar.markdown("### 📋 Analysis Options")
-        selected_user = st.sidebar.selectbox("Select User for Analysis", user_list)
-        
-        if st.sidebar.button("🚀 Show Analysis", type="primary"):
-            # Stats Area with cards
-            st.markdown("### 📊 Chat Statistics")
-            num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+        # Debug: Show first few rows and check for valid dates
+        st.markdown('#### 🐞 Debug: Parsed Data Preview')
+        st.dataframe(df.head(10))
+        if df['date'].isnull().all():
+            st.warning('❌ No valid dates could be parsed from your chat file. Please check your file format. Analysis cannot proceed.')
+        else:
+            # Fetch unique users
+            user_list = df['user'].unique().tolist()
+            if 'group_notification' in user_list:
+                user_list.remove('group_notification')
+            user_list.sort()
+            user_list.insert(0, "Overall")
             
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Total Messages</h3>
-                    <h2>{num_messages:,}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Total Words</h3>
-                    <h2>{words:,}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col3:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Media Shared</h3>
-                    <h2>{num_media_messages:,}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col4:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Links Shared</h3>
-                    <h2>{num_links:,}</h2>
-                </div>
-                """, unsafe_allow_html=True)
+            # Analysis options in sidebar
+            st.sidebar.markdown("### 📋 Analysis Options")
+            selected_user = st.sidebar.selectbox("Select User for Analysis", user_list)
             
-            st.markdown("---")
-            
-            # Timeline visualization
-            st.markdown("### 📅 Timeline Analysis")
-            
-            # Monthly Timeline
-            st.markdown("#### 📈 Monthly Activity")
-            timeline = helper.monthly_timeline(selected_user, df)
-            fig = px.line(timeline, x='time', y='message', 
-                         title='Monthly Message Count',
-                         labels={'time': 'Month', 'message': 'Number of Messages'},
-                         template='plotly_dark')
-            fig.update_traces(line=dict(color='#4f46e5', width=3))
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                            paper_bgcolor='rgba(0,0,0,0)',
-                            xaxis=dict(showgrid=False, color='#b8b8b8'),
-                            yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
-                            font=dict(color='#ffffff'))
-            st.plotly_chart(fig, use_container_width=True)
-
-            # Daily Timeline
-            st.markdown("#### 📊 Daily Activity")
-            daily_timeline = helper.daily_timeline(selected_user, df)
-            fig = px.area(daily_timeline, x='only_date', y='message',
-                         title='Daily Message Count',
-                         labels={'only_date': 'Date', 'message': 'Number of Messages'},
-                         template='plotly_dark')
-            fig.update_traces(fill='tozeroy', line=dict(color='#7c3aed', width=2))
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                            paper_bgcolor='rgba(0,0,0,0)',
-                            xaxis=dict(showgrid=False, color='#b8b8b8'),
-                            yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
-                            font=dict(color='#ffffff'))
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Activity Map
-            st.markdown("### 📊 Activity Map")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("#### 📅 Most Active Day")
-                busy_day = helper.week_activity_map(selected_user, df)
-                busy_day_df = busy_day.reset_index()
-                busy_day_df.columns = ['Day of Week', 'Number of Messages']
-                fig = px.bar(
-                    busy_day_df,
-                    x='Day of Week',
-                    y='Number of Messages',
-                    labels={'x': 'Day of Week', 'y': 'Number of Messages'},
-                    color_discrete_sequence=['#4f46e5'],
-                    template='plotly_dark'
-                )
+            if st.sidebar.button("🚀 Show Analysis", type="primary"):
+                # Stats Area with cards
+                st.markdown("### 📊 Chat Statistics")
+                num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+                
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Total Messages</h3>
+                        <h2>{num_messages:,}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col2:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Total Words</h3>
+                        <h2>{words:,}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col3:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Media Shared</h3>
+                        <h2>{num_media_messages:,}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col4:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Links Shared</h3>
+                        <h2>{num_links:,}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                st.markdown("---")
+                
+                # Timeline visualization
+                st.markdown("### 📅 Timeline Analysis")
+                
+                # Monthly Timeline
+                st.markdown("#### 📈 Monthly Activity")
+                timeline = helper.monthly_timeline(selected_user, df)
+                fig = px.line(timeline, x='time', y='message', 
+                             title='Monthly Message Count',
+                             labels={'time': 'Month', 'message': 'Number of Messages'},
+                             template='plotly_dark')
+                fig.update_traces(line=dict(color='#4f46e5', width=3))
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                 paper_bgcolor='rgba(0,0,0,0)',
                                 xaxis=dict(showgrid=False, color='#b8b8b8'),
                                 yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
                                 font=dict(color='#ffffff'))
                 st.plotly_chart(fig, use_container_width=True)
-            
-            with col2:
-                st.markdown("#### 📆 Most Active Month")
-                busy_month = helper.month_activity_map(selected_user, df)
-                busy_month_df = busy_month.reset_index()
-                busy_month_df.columns = ['Month', 'Number of Messages']
-                fig = px.bar(
-                    busy_month_df,
-                    x='Month',
-                    y='Number of Messages',
-                    labels={'x': 'Month', 'y': 'Number of Messages'},
-                    color_discrete_sequence=['#7c3aed'],
-                    template='plotly_dark'
-                )
+
+                # Daily Timeline
+                st.markdown("#### 📊 Daily Activity")
+                daily_timeline = helper.daily_timeline(selected_user, df)
+                fig = px.area(daily_timeline, x='only_date', y='message',
+                             title='Daily Message Count',
+                             labels={'only_date': 'Date', 'message': 'Number of Messages'},
+                             template='plotly_dark')
+                fig.update_traces(fill='tozeroy', line=dict(color='#7c3aed', width=2))
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                 paper_bgcolor='rgba(0,0,0,0)',
                                 xaxis=dict(showgrid=False, color='#b8b8b8'),
                                 yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
                                 font=dict(color='#ffffff'))
                 st.plotly_chart(fig, use_container_width=True)
-            
-            # Weekly Activity Heatmap
-            st.markdown("#### 🔥 Weekly Activity Heatmap")
-            user_heatmap = helper.activity_heatmap(selected_user, df)
-            if user_heatmap is not None and not user_heatmap.empty:
-                try:
-                    fig = px.imshow(user_heatmap.values,
-                                  labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
-                                  x=[f"{h:02d}:00" for h in range(24)],
-                                  y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                                  color_continuous_scale='Viridis',
-                                  template='plotly_dark')
+                
+                # Activity Map
+                st.markdown("### 📊 Activity Map")
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("#### 📅 Most Active Day")
+                    busy_day = helper.week_activity_map(selected_user, df)
+                    busy_day_df = busy_day.reset_index()
+                    busy_day_df.columns = ['Day of Week', 'Number of Messages']
+                    fig = px.bar(
+                        busy_day_df,
+                        x='Day of Week',
+                        y='Number of Messages',
+                        labels={'x': 'Day of Week', 'y': 'Number of Messages'},
+                        color_discrete_sequence=['#4f46e5'],
+                        template='plotly_dark'
+                    )
                     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                     paper_bgcolor='rgba(0,0,0,0)',
                                     xaxis=dict(showgrid=False, color='#b8b8b8'),
-                                    yaxis=dict(showgrid=False, color='#b8b8b8'),
+                                    yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
                                     font=dict(color='#ffffff'))
                     st.plotly_chart(fig, use_container_width=True)
-                except Exception as e:
-                    st.warning("Unable to display heatmap. Data may be insufficient.")
-            else:
-                st.info("Not enough data to generate activity heatmap.")
-            
-            # Finding the busiest users in the group (Group level only)
-            if selected_user == 'Overall':
-                st.markdown("### 👥 User Activity")
-                x, new_df = helper.most_busy_users(df)
                 
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown("#### 🏆 Most Active Users")
-                    fig = px.bar(x=x.index, y=x.values,
-                                labels={'x': 'User', 'y': 'Number of Messages'},
-                                color=x.values,
-                                color_continuous_scale='Bluered',
+                with col2:
+                    st.markdown("#### 📆 Most Active Month")
+                    busy_month = helper.month_activity_map(selected_user, df)
+                    busy_month_df = busy_month.reset_index()
+                    busy_month_df.columns = ['Month', 'Number of Messages']
+                    fig = px.bar(
+                        busy_month_df,
+                        x='Month',
+                        y='Number of Messages',
+                        labels={'x': 'Month', 'y': 'Number of Messages'},
+                        color_discrete_sequence=['#7c3aed'],
+                        template='plotly_dark'
+                    )
+                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                    yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
+                                    font=dict(color='#ffffff'))
+                    st.plotly_chart(fig, use_container_width=True)
+                
+                # Weekly Activity Heatmap
+                st.markdown("#### 🔥 Weekly Activity Heatmap")
+                user_heatmap = helper.activity_heatmap(selected_user, df)
+                if user_heatmap is not None and not user_heatmap.empty:
+                    try:
+                        fig = px.imshow(user_heatmap.values,
+                                      labels=dict(x="Hour of Day", y="Day of Week", color="Messages"),
+                                      x=[f"{h:02d}:00" for h in range(24)],
+                                      y=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                                      color_continuous_scale='Viridis',
+                                      template='plotly_dark')
+                        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                        paper_bgcolor='rgba(0,0,0,0)',
+                                        xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                        yaxis=dict(showgrid=False, color='#b8b8b8'),
+                                        font=dict(color='#ffffff'))
+                        st.plotly_chart(fig, use_container_width=True)
+                    except Exception as e:
+                        st.warning("Unable to display heatmap. Data may be insufficient.")
+                else:
+                    st.info("Not enough data to generate activity heatmap.")
+                
+                # Finding the busiest users in the group (Group level only)
+                if selected_user == 'Overall':
+                    st.markdown("### 👥 User Activity")
+                    x, new_df = helper.most_busy_users(df)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown("#### 🏆 Most Active Users")
+                        fig = px.bar(x=x.index, y=x.values,
+                                    labels={'x': 'User', 'y': 'Number of Messages'},
+                                    color=x.values,
+                                    color_continuous_scale='Bluered',
+                                    template='plotly_dark')
+                        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                        paper_bgcolor='rgba(0,0,0,0)',
+                                        xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                        yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
+                                        font=dict(color='#ffffff'),
+                                        showlegend=False)
+                        st.plotly_chart(fig, use_container_width=True)
+                    
+                    with col2:
+                        st.markdown("#### 📊 User Activity Distribution")
+                        st.dataframe(new_df.style.background_gradient(cmap='Blues'),
+                                   use_container_width=True)
+
+                # Word Cloud Analysis
+                st.markdown("### 📝 Word Cloud")
+                st.markdown("Visual representation of the most frequently used words in the conversation.")
+                df_wc = helper.create_wordcloud(selected_user, df)
+                fig, ax = plt.subplots(figsize=(10, 6))
+                ax.imshow(df_wc, interpolation='bilinear')
+                ax.axis('off')
+                plt.tight_layout()
+                st.pyplot(fig, use_container_width=True)
+                
+                # Most Common Words
+                st.markdown("### 📊 Most Common Words")
+                most_common_df = helper.most_common_words(selected_user, df)
+                
+                if not most_common_df.empty:
+                    fig = px.bar(most_common_df.head(20), 
+                                x=most_common_df[1].head(20), 
+                                y=most_common_df[0].head(20),
+                                orientation='h',
+                                labels={'x': 'Frequency', 'y': 'Words'},
+                                color=most_common_df[1].head(20),
+                                color_continuous_scale='Viridis',
                                 template='plotly_dark')
                     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                     paper_bgcolor='rgba(0,0,0,0)',
                                     xaxis=dict(showgrid=False, color='#b8b8b8'),
                                     yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
                                     font=dict(color='#ffffff'),
-                                    showlegend=False)
+                                    showlegend=False,
+                                    height=600)
                     st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("Not enough data to display common words.")
                 
-                with col2:
-                    st.markdown("#### 📊 User Activity Distribution")
-                    st.dataframe(new_df.style.background_gradient(cmap='Blues'),
-                               use_container_width=True)
-
-            # Word Cloud Analysis
-            st.markdown("### 📝 Word Cloud")
-            st.markdown("Visual representation of the most frequently used words in the conversation.")
-            df_wc = helper.create_wordcloud(selected_user, df)
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.imshow(df_wc, interpolation='bilinear')
-            ax.axis('off')
-            plt.tight_layout()
-            st.pyplot(fig, use_container_width=True)
-            
-            # Most Common Words
-            st.markdown("### 📊 Most Common Words")
-            most_common_df = helper.most_common_words(selected_user, df)
-            
-            if not most_common_df.empty:
-                fig = px.bar(most_common_df.head(20), 
-                            x=most_common_df[1].head(20), 
-                            y=most_common_df[0].head(20),
-                            orientation='h',
-                            labels={'x': 'Frequency', 'y': 'Words'},
-                            color=most_common_df[1].head(20),
-                            color_continuous_scale='Viridis',
-                            template='plotly_dark')
-                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                                paper_bgcolor='rgba(0,0,0,0)',
-                                xaxis=dict(showgrid=False, color='#b8b8b8'),
-                                yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
-                                font=dict(color='#ffffff'),
-                                showlegend=False,
-                                height=600)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("Not enough data to display common words.")
-            
-            # Enhanced Chat Statistics
-            st.markdown("### 📊 Detailed Chat Statistics")
-            
-            # Calculate additional statistics
-            total_days = (df['date'].max() - df['date'].min()).days + 1 if len(df) > 0 else 0
-            avg_messages_per_day = num_messages / total_days if total_days > 0 else 0
-            avg_words_per_message = words / num_messages if num_messages > 0 else 0
-            
-            # Display detailed stats in columns
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Avg Messages/Day</h3>
-                    <h2>{avg_messages_per_day:.1f}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col2:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Avg Words/Message</h3>
-                    <h2>{avg_words_per_message:.1f}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col3:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Total Days</h3>
-                    <h2>{total_days}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            with col4:
-                st.markdown(f"""
-                <div class='stat-card'>
-                    <h3>Media Ratio</h3>
-                    <h2>{(num_media_messages/num_messages*100):.1f}%</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Emoji Analysis
-            st.markdown("### 😊 Emoji Analysis")
-            emoji_df = helper.emoji_helper(selected_user, df)
-            
-            if not emoji_df.empty and len(emoji_df) > 0:
-                col1, col2 = st.columns(2)
+                # Enhanced Chat Statistics
+                st.markdown("### 📊 Detailed Chat Statistics")
                 
+                # Calculate additional statistics
+                total_days = (df['date'].max() - df['date'].min()).days + 1 if len(df) > 0 else 0
+                avg_messages_per_day = num_messages / total_days if total_days > 0 else 0
+                avg_words_per_message = words / num_messages if num_messages > 0 else 0
+                
+                # Display detailed stats in columns
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.markdown("#### 🎯 Top Emojis Used")
-                    st.dataframe(emoji_df.head(10).style.background_gradient(cmap='YlOrRd'),
-                               use_container_width=True)
-                
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Avg Messages/Day</h3>
+                        <h2>{avg_messages_per_day:.1f}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
                 with col2:
-                    st.markdown("#### 📊 Emoji Distribution")
-                    if len(emoji_df) >= 5:
-                        fig = px.pie(emoji_df.head(5), 
-                                   values=emoji_df[1].head(5), 
-                                   names=emoji_df[0].head(5),
-                                   hole=0.5,
-                                   color_discrete_sequence=px.colors.sequential.RdBu,
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Avg Words/Message</h3>
+                        <h2>{avg_words_per_message:.1f}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col3:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Total Days</h3>
+                        <h2>{total_days}</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col4:
+                    st.markdown(f"""
+                    <div class='stat-card'>
+                        <h3>Media Ratio</h3>
+                        <h2>{(num_media_messages/num_messages*100):.1f}%</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Emoji Analysis
+                st.markdown("### 😊 Emoji Analysis")
+                emoji_df = helper.emoji_helper(selected_user, df)
+                
+                if not emoji_df.empty and len(emoji_df) > 0:
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.markdown("#### 🎯 Top Emojis Used")
+                        st.dataframe(emoji_df.head(10).style.background_gradient(cmap='YlOrRd'),
+                                   use_container_width=True)
+                    
+                    with col2:
+                        st.markdown("#### 📊 Emoji Distribution")
+                        if len(emoji_df) >= 5:
+                            fig = px.pie(emoji_df.head(5), 
+                                       values=emoji_df[1].head(5), 
+                                       names=emoji_df[0].head(5),
+                                       hole=0.5,
+                                       color_discrete_sequence=px.colors.sequential.RdBu,
+                                       template='plotly_dark')
+                            fig.update_traces(textposition='inside', textinfo='percent+label')
+                            fig.update_layout(showlegend=False,
+                                            margin=dict(t=0, b=0, l=0, r=0),
+                                            font=dict(color='#ffffff'))
+                            st.plotly_chart(fig, use_container_width=True)
+                        else:
+                            st.info("Not enough emoji data for visualization")
+                            
+                    # Most Used Emojis Bar Chart
+                    st.markdown("#### 📈 Most Used Emojis Trend")
+                    if len(emoji_df) >= 10:
+                        fig = px.bar(emoji_df.head(10), 
+                                   x=emoji_df[0].head(10), 
+                                   y=emoji_df[1].head(10),
+                                   labels={'x': 'Emoji', 'y': 'Frequency'},
+                                   color=emoji_df[1].head(10),
+                                   color_continuous_scale='Viridis',
                                    template='plotly_dark')
-                        fig.update_traces(textposition='inside', textinfo='percent+label')
-                        fig.update_layout(showlegend=False,
-                                        margin=dict(t=0, b=0, l=0, r=0),
-                                        font=dict(color='#ffffff'))
+                        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                                        paper_bgcolor='rgba(0,0,0,0)',
+                                        xaxis=dict(showgrid=False, color='#b8b8b8'),
+                                        yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
+                                        font=dict(color='#ffffff'),
+                                        showlegend=False)
                         st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.info("Not enough emoji data for visualization")
-                        
-                # Most Used Emojis Bar Chart
-                st.markdown("#### 📈 Most Used Emojis Trend")
-                if len(emoji_df) >= 10:
-                    fig = px.bar(emoji_df.head(10), 
-                               x=emoji_df[0].head(10), 
-                               y=emoji_df[1].head(10),
-                               labels={'x': 'Emoji', 'y': 'Frequency'},
-                               color=emoji_df[1].head(10),
-                               color_continuous_scale='Viridis',
-                               template='plotly_dark')
-                    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
-                                    paper_bgcolor='rgba(0,0,0,0)',
-                                    xaxis=dict(showgrid=False, color='#b8b8b8'),
-                                    yaxis=dict(showgrid=True, gridcolor='#374151', color='#b8b8b8'),
-                                    font=dict(color='#ffffff'),
-                                    showlegend=False)
-                    st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No emoji data available for analysis.")
-            
-            # Download PDF Report
-            st.markdown("### 📄 Download Report")
-            
-            # Create PDF report
-            try:
-                pdf_buffer = create_pdf_report(df, selected_user, num_messages, words, num_media_messages, num_links)
+                else:
+                    st.info("No emoji data available for analysis.")
                 
-                # Display download button
-                st.download_button(
-                    label="📄 Download PDF Report",
-                    data=pdf_buffer.getvalue(),
-                    file_name=f"echomind_report_{selected_user}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                    mime="application/pdf",
-                    key="pdf_download"
-                )
+                # Download PDF Report
+                st.markdown("### 📄 Download Report")
                 
-                st.success("✅ PDF report generated successfully! Click the button above to download.")
+                # Create PDF report
+                try:
+                    pdf_buffer = create_pdf_report(df, selected_user, num_messages, words, num_media_messages, num_links)
+                    
+                    # Display download button
+                    st.download_button(
+                        label="📄 Download PDF Report",
+                        data=pdf_buffer.getvalue(),
+                        file_name=f"echomind_report_{selected_user}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                        mime="application/pdf",
+                        key="pdf_download"
+                    )
+                    
+                    st.success("✅ PDF report generated successfully! Click the button above to download.")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error generating PDF report: {str(e)}")
+                    st.info("Please try again or contact support if the issue persists.")
                 
-            except Exception as e:
-                st.error(f"❌ Error generating PDF report: {str(e)}")
-                st.info("Please try again or contact support if the issue persists.")
-            
-            # Add QR Code for sharing
-            st.markdown("### 📱 Share Your Analysis")
-            st.markdown("Share your chat analysis with others!")
-            
-            # Generate QR code for the app URL
-            # Create QR code
-            qr = qrcode.QRCode(version=1, box_size=10, border=5)
-            qr.add_data("https://echomind-app.streamlit.app/")
-            qr.make(fit=True)
-            
-            # Create QR code image
-            qr_img = qr.make_image(fill_color="black", back_color="white")
-            
-            # Convert to bytes for display
-            img_buffer = io.BytesIO()
-            qr_img.save(img_buffer, format='PNG')
-            img_buffer.seek(0)
-            
-            # Display QR code
-            st.image(img_buffer, caption="Scan to share EchoMind", width=200)
-            
-            # Add simple footer
-            simple_footer()
+                # Add QR Code for sharing
+                st.markdown("### 📱 Share Your Analysis")
+                st.markdown("Share your chat analysis with others!")
+                
+                # Generate QR code for the app URL
+                # Create QR code
+                qr = qrcode.QRCode(version=1, box_size=10, border=5)
+                qr.add_data("https://echomind-app.streamlit.app/")
+                qr.make(fit=True)
+                
+                # Create QR code image
+                qr_img = qr.make_image(fill_color="black", back_color="white")
+                
+                # Convert to bytes for display
+                img_buffer = io.BytesIO()
+                qr_img.save(img_buffer, format='PNG')
+                img_buffer.seek(0)
+                
+                # Display QR code
+                st.image(img_buffer, caption="Scan to share EchoMind", width=200)
+                
+                # Add simple footer
+                simple_footer()
 
 elif st.session_state.current_page == "about":
     st.markdown("## About EchoMind")

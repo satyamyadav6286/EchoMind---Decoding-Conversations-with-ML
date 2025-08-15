@@ -229,10 +229,16 @@ elif st.session_state.current_page == "upload":
             with col1:
                 st.markdown("#### 📅 Most Active Day")
                 busy_day = helper.week_activity_map(selected_user, df)
-                fig = px.bar(busy_day, x=busy_day.index, y=busy_day.values,
-                            labels={'x': 'Day of Week', 'y': 'Number of Messages'},
-                            color_discrete_sequence=['#4f46e5'],
-                            template='plotly_dark')
+                busy_day_df = busy_day.reset_index()
+                busy_day_df.columns = ['Day of Week', 'Number of Messages']
+                fig = px.bar(
+                    busy_day_df,
+                    x='Day of Week',
+                    y='Number of Messages',
+                    labels={'x': 'Day of Week', 'y': 'Number of Messages'},
+                    color_discrete_sequence=['#4f46e5'],
+                    template='plotly_dark'
+                )
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                 paper_bgcolor='rgba(0,0,0,0)',
                                 xaxis=dict(showgrid=False, color='#b8b8b8'),
@@ -243,10 +249,16 @@ elif st.session_state.current_page == "upload":
             with col2:
                 st.markdown("#### 📆 Most Active Month")
                 busy_month = helper.month_activity_map(selected_user, df)
-                fig = px.bar(busy_month, x=busy_month.index, y=busy_month.values,
-                            labels={'x': 'Month', 'y': 'Number of Messages'},
-                            color_discrete_sequence=['#7c3aed'],
-                            template='plotly_dark')
+                busy_month_df = busy_month.reset_index()
+                busy_month_df.columns = ['Month', 'Number of Messages']
+                fig = px.bar(
+                    busy_month_df,
+                    x='Month',
+                    y='Number of Messages',
+                    labels={'x': 'Month', 'y': 'Number of Messages'},
+                    color_discrete_sequence=['#7c3aed'],
+                    template='plotly_dark'
+                )
                 fig.update_layout(plot_bgcolor='rgba(0,0,0,0)',
                                 paper_bgcolor='rgba(0,0,0,0)',
                                 xaxis=dict(showgrid=False, color='#b8b8b8'),

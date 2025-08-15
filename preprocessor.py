@@ -2,16 +2,35 @@ import re
 import pandas as pd
 
 def preprocess(data):
-    pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+    # Robust WhatsApp date pattern: matches e.g. 12/05/2023, 10:15 - or 5/12/23, 10:15 AM - or 12-05-2023, 10:15 pm -
+    pattern = r'((?:\d{1,2}[\/\-]){2}\d{2,4}),?\s\d{1,2}:\d{2}(?:\s?[APMapm]{2})?\s-\s'
 
     messages = re.split(pattern, data)[1:]
-    dates = re.findall(pattern, data)
+    # The split will alternate: [date, message, date, message, ...]
+    dates = messages[::2]
+    messages = messages[1::2]
 
     df = pd.DataFrame({'user_message': messages, 'message_date': dates})
     # convert message_date type
     df['message_date'] = df['message_date'].astype(str).str.strip()
-    # Note: If date formats are highly variable, fallback to dateutil may cause inconsistencies.
-    df['message_date'] = pd.to_datetime(df['message_date'], errors='coerce')
+    # Try multiple common WhatsApp date formats
+    def try_parse_date(s):
+        for fmt in [
+            '%d/%m/%Y, %H:%M', '%d/%m/%y, %H:%M', '%d-%m-%Y, %H:%M', '%d-%m-%y, %H:%M',
+            '%d/%m/%Y, %I:%M %p', '%d/%m/%y, %I:%M %p', '%d-%m-%Y, %I:%M %p', '%d-%m-%y, %I:%M %p',
+            '%m/%d/%Y, %H:%M', '%m/%d/%y, %H:%M', '%m-%d-%Y, %H:%M', '%m-%d-%y, %H:%M',
+            '%m/%d/%Y, %I:%M %p', '%m/%d/%y, %I:%M %p', '%m-%d-%Y, %I:%M %p', '%m-%d-%y, %I:%M %p',
+        ]:
+            try:
+                return pd.to_datetime(s, format=fmt)
+            except Exception:
+                continue
+        # Fallback to dateutil parser
+        try:
+            return pd.to_datetime(s, errors='coerce')
+        except Exception:
+            return pd.NaT
+    df['message_date'] = df['message_date'].apply(try_parse_date)
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
